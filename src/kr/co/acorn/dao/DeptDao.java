@@ -151,7 +151,7 @@ public class DeptDao {
 	}
 
 	// ArrayList는 사이즈를 따로 설정안해도 된다.
-	public ArrayList<DeptDto> select() {
+	public ArrayList<DeptDto> select(int start, int len) {
 		// 마땅히 new할 곳이 없어서 여기서 객체생성
 		ArrayList<DeptDto> list = new ArrayList<DeptDto>();
 
@@ -165,13 +165,17 @@ public class DeptDao {
 			StringBuffer sql = new StringBuffer();
 			sql.append("SELECT deptno, dname, loc ");
 			sql.append("FROM dept ");
-			sql.append("ORDER BY deptno");
-
+			sql.append("ORDER BY deptno ");
+			sql.append("LIMIT ?,? ");
+		
 			pstmt = con.prepareStatement(sql.toString());
+			int index = 0;
+			pstmt.setInt(++index, start);
+			pstmt.setInt(++index, len);
 			rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				int index = 1;
+				index = 1;
 				int deptno = rs.getInt(index++);
 				String dname = rs.getString(index++);
 				String loc = rs.getString(index++);
