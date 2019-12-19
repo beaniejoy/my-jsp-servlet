@@ -1,4 +1,4 @@
-package kr.co.acorn.hello;
+package beanie.hello;
 
 import java.io.IOException;
 
@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import kr.co.acorn.dao.DeptDao;
-import kr.co.acorn.dto.DeptDto;
+import beanie.dao.DeptDao;
+import beanie.dto.DeptDto;
 
 @WebServlet("/SaveDeptServlet")
 public class SaveDeptServlet extends HttpServlet{

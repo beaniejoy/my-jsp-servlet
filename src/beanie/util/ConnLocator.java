@@ -1,4 +1,4 @@
-package kr.co.acorn.util;
+package beanie.util;
 
 import java.sql.Connection;
 import java.sql.SQLException;

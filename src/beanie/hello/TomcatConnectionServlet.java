@@ -1,4 +1,4 @@
-package kr.co.acorn.hello;
+package beanie.hello;
 
 import java.io.IOException;
 import java.io.PrintWriter;
