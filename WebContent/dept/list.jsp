@@ -1,5 +1,5 @@
-<%@page import="beanie.dto.DeptDto"%>
-<%@page import="beanie.dao.DeptDao"%>
+<%@ page import="beanie.dto.DeptDto"%>
+<%@ page import="beanie.dao.DeptDao"%>
 <%@ page import="java.util.ArrayList"%>
 
 <%@ page pageEncoding="utf-8"%>
