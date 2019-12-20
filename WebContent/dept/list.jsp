@@ -15,7 +15,7 @@
 	int endPage = 0; // 페이지 한 묶음에서 끝페이지숫자
 	int currentBlock = 0; // 현재 페이지 묶음 중 어디 블럭에 속해있는지
 	// 나중에 startPage와 endPage를 알아내기 위해 중요한 데이터
-
+	
 	String tempPage = request.getParameter("page");
 
 	// cPage(현재 페이지 정하기)
@@ -89,7 +89,7 @@
 						for (DeptDto dto : list) {
 					%>
 					<tr>
-						<td><a href="view.jsp"><%=dto.getNo()%></a></td>
+						<td><a href="view.jsp?page=<%=cPage%>"><%=dto.getNo()%></a></td>
 						<td><%=dto.getName()%></td>
 						<td><%=dto.getLoc()%></td>
 					</tr>
@@ -150,7 +150,7 @@
 
 			<div class="text-right">
 				<!-- 하이퍼링크로 해도 상관 없다. (a tag) -->
-				<a href="write.jsp" class="btn btn-outline-secondary">부서등록</a>
+				<a href="write.jsp?page=<%=cPage %>" class="btn btn-outline-secondary">부서등록</a>
 			</div>
 
 		</div>
