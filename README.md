@@ -29,9 +29,7 @@ localhost/crawling/list.jsp?page=1&start=20140711&end=20191219 이런식으로 p
 
 - date형 변수 받아서 형식 바꾸기  
 크롤링 대상 사이트는 거래날짜가 "DEC 20, 2019" 이런식으로 나옴. 이걸 크롤링으로 받게 되면 String형식 되어버림  
-
->"DEC 20, 2019" > "2019-12-20" 날짜형식 바꿔서 DB에 저장하기
-
+**"DEC 20, 2019" > "2019-12-20"** 날짜형식 바꿔서 DB에 저장하기  
 **[java]SimpleDateFormat Class**를 이용하자  
 ```
 String changeDate = null;
