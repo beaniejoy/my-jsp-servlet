@@ -71,7 +71,7 @@ public class CrawlingDao {
 	}
 	
 	
-	public ArrayList<CrawlingDto> select(int start, int len){
+	public ArrayList<CrawlingDto> select(int start, int len, String sDate, String eDate){
 		ArrayList<CrawlingDto> list = new ArrayList<CrawlingDto>();
 		
 		Connection con = null;
@@ -82,12 +82,15 @@ public class CrawlingDao {
 			StringBuffer sql = new StringBuffer();
 			sql.append("SELECT dealdate, opentime, high, low, endtime, vol, mcap ");
 			sql.append("FROM bitcoin ");
+			sql.append("WHERE dealdate BETWEEN ? AND ? ");
 			sql.append("ORDER BY dealdate DESC ");
 			sql.append("LIMIT ?, ? ");
 			
 			pstmt = con.prepareStatement(sql.toString());
 			
 			int index = 0;
+			pstmt.setString(++index, sDate);
+			pstmt.setString(++index, eDate);
 			pstmt.setInt(++index, start);
 			pstmt.setInt(++index, len);
 			rs = pstmt.executeQuery();
@@ -124,7 +127,7 @@ public class CrawlingDao {
 		return list;
 	}
 	
-	public int getTotalRows() {
+	public int getTotalRows(String sDate, String eDate) {
 		int count = 0;
 
 		Connection con = null;
@@ -135,13 +138,18 @@ public class CrawlingDao {
 			StringBuffer sql = new StringBuffer();
 			sql.append("SELECT COUNT(dealdate)");
 			sql.append("FROM bitcoin ");
+			sql.append("WHERE dealdate BETWEEN ? AND ? ");
+			
 
 			pstmt = con.prepareStatement(sql.toString());
-
+			int index = 0;
+			pstmt.setString(++index, sDate);
+			pstmt.setString(++index, eDate);
+			
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) {
-				int index = 0;
+				index = 0;
 				count = rs.getInt(++index);
 			}
 
