@@ -6,7 +6,7 @@
 #### 해결해야하는 부분
 
 1. Dept, Emp 웹페이지 구현해보기
-2. Crawling and Save bitcoin historical data in DB.  
+2. ~~Crawling and Save bitcoin historical data in DB.~~
 ~~select option을 통해 날짜 범위를 받으면 그 해당하는 부분만 테이블에 뿌리기~~    
 3. 뿌려진 데이터 차트로 표현해보기  
 4. 코인 별로 만들어보기  
