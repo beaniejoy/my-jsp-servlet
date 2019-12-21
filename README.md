@@ -25,6 +25,27 @@ script를 통해 jQuery를 이용할시 footer include한 곳보다 아래에서
 
 - url parameter 줄이기  
 localhost/crawling/list.jsp?page=1&start=20140711&end=20191219 이런식으로 parameter를 축약함. 원래는 start의 연,월,일따로 end의 연,월,일 따로 parameter지정해서 넘기려고 하니 url이 지저분해짐 > 하나로 묶어서 parameter로 보냄  
-(select option으로 넘겼기 때문에 parameter로 start, end의 연, 월, 일 따로 지정돼있음. post방식으로 넘겨서 url에는 보이지 않음.)
+(select option으로 넘겼기 때문에 parameter로 start, end의 연, 월, 일 따로 지정돼있음. post방식으로 넘겨서 url에는 보이지 않음.)  
 
+- date형 변수 받아서 형식 바꾸기  
+크롤링 대상 사이트는 거래날짜가 "DEC 20, 2019" 이런식으로 나옴. 이걸 크롤링으로 받게 되면 String형식 되어버림  
 
+>"DEC 20, 2019" > "2019-12-20" 날짜형식 바꿔서 DB에 저장하기
+
+**[java]SimpleDateFormat Class**를 이용하자  
+```
+String changeDate = null;
+SimpleDateFormat in = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
+SimpleDateFormat out = new SimpleDateFormat("yyyy-MM-dd");
+try {
+	// String => Date
+	// 지정한 Date Form대로 y,m,d 나눠서 Date로 parsing하겠다.
+	Date usDate = in.parse(us);
+			
+	// Date => String
+	changeDate = out.format(usDate);
+} catch (ParseException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+```
