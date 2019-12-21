@@ -24,7 +24,7 @@ script를 통해 jQuery를 이용할시 footer include한 곳보다 아래에서
 - 새로고침하면 alert 알림표시가 뜨는데 없앨 수는 없는지(해결 못함)  
 
 - url parameter 줄이기  
-http://localhost/crawling/list.jsp?page=1&start=20140711&end=20191219 이런식으로 parameter를 축약함. 원래는 start의 연,월,일따로 end의 연,월,일 따로 parameter지정해서 넘기려고 하니 url이 지저분해짐 > 하나로 묶어서 parameter로 보냄  
+localhost/crawling/list.jsp?page=1&start=20140711&end=20191219 이런식으로 parameter를 축약함. 원래는 start의 연,월,일따로 end의 연,월,일 따로 parameter지정해서 넘기려고 하니 url이 지저분해짐 > 하나로 묶어서 parameter로 보냄  
 (select option으로 넘겼기 때문에 parameter로 start, end의 연, 월, 일 따로 지정돼있음. post방식으로 넘겨서 url에는 보이지 않음.)
 
 
