@@ -12,9 +12,14 @@ import beanie.dto.CrawlingDto;
 
 public class CrawlingData {
 
-	public static void dataUpdate() {
+	public static boolean dataUpdate(String coin) {
+		boolean isSuccess = true;
+		
+		CrawlingDao dao = CrawlingDao.getInstance();
+		
 		int cYear = 2019;
 		while (cYear >= 2013) {
+			
 			StringBuffer startDate = new StringBuffer();
 			StringBuffer endDate = new StringBuffer();
 
@@ -26,14 +31,12 @@ public class CrawlingData {
 			startDate.append("12");
 			startDate.append("19");
 			
-			String url = "https://coinmarketcap.com/currencies/ethereum/historical-data/?start=" + startDate.toString()
+			String url = "https://coinmarketcap.com/currencies/"+ coin +"/historical-data/?start=" + startDate.toString()
 					+ "&end=" + endDate.toString();
 			Document doc = null;
 
 			try {
 				doc = Jsoup.connect(url).get();
-
-				CrawlingDao dao = CrawlingDao.getInstance();
 
 				Elements elements = doc.select(".cmc-table__table-wrapper-outer table tbody tr");
 
@@ -42,7 +45,7 @@ public class CrawlingData {
 					// yyyy-MM-dd 형식으로 string 변환
 					String date = DateFormChange.changeDate(trElement.child(0).text().trim());
 					// 중복된 데이터가 존재할 시 continue로 넘김
-					if(dao.isThere(date)) {
+					if(dao.isThere(date, coin)) {
 						continue;
 					}
 					double open = Double.parseDouble(trElement.child(1).text().trim().replace(",", ""));
@@ -52,13 +55,21 @@ public class CrawlingData {
 					long volume = Long.parseLong(trElement.child(5).text().trim().replace(",", ""));
 					long cap = Long.parseLong(trElement.child(6).text().trim().replace(",", ""));
 					CrawlingDto dto = new CrawlingDto(date, open, high, low, close, volume, cap);
-					dao.insert(dto);
+					isSuccess = dao.insert(dto, coin);
+					if(!isSuccess) {
+						return isSuccess;
+					}
 				}
-
+				
+				
 			} catch (IOException e) {
 				e.printStackTrace();
+				isSuccess = false;
 			}
+			
 		}
+		
+		return isSuccess;
 	}
 
 	public static void newDataUpdate() {

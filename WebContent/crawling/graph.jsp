@@ -9,18 +9,25 @@
 	String tempPage = request.getParameter("page");
 	String tempStart = request.getParameter("start");
 	String tempEnd = request.getParameter("end");
+	String tempCoin = request.getParameter("coin");
 
 	if (tempPage == null || tempPage.length() == 0) {
 		tempPage = "1";
 	}
-	if (tempStart == null || tempStart.length() == 0) {
+	if (tempCoin == null || tempCoin.length() == 0) {
 		response.sendRedirect("list.jsp?page=" + tempPage);
+		return;
+	}
+	if (tempStart == null || tempStart.length() == 0) {
+		response.sendRedirect("list.jsp?coin=" + tempCoin + "&page=" + tempPage);
 		return;
 	}
 	if (tempEnd == null || tempEnd.length() == 0) {
-		response.sendRedirect("list.jsp?page=" + tempPage);
+		response.sendRedirect("list.jsp?coin=" + tempCoin + "&page=" + tempPage);
 		return;
 	}
+	
+	
 	int cPage = 0;
 	int totalRows = 0;
 
@@ -40,9 +47,9 @@
 	endDate.append("-");
 	endDate.append(tempEnd.substring(6));
 
-	totalRows = dao.getTotalRows(startDate.toString(), tempEnd.toString());
+	totalRows = dao.getTotalRows(startDate.toString(), tempEnd.toString(), tempCoin);
 	ArrayList<CrawlingDto> list = new ArrayList<CrawlingDto>();
-	list = dao.select(0, totalRows, startDate.toString(), endDate.toString());
+	list = dao.select(0, totalRows, startDate.toString(), endDate.toString(), tempCoin);
 %>
 <!-- breadcrumb start -->
 <nav aria-label="breadcrumb">
@@ -65,12 +72,12 @@
 	function drawTrendlines() {
 		var data = new google.visualization.DataTable();
 		data.addColumn('datetime', 'date');
-		data.addColumn('number', 'bitcoin');
+		data.addColumn('number', '<%=tempCoin%>');
 <%for (CrawlingDto dto : list) {
 				int year = Integer.parseInt(dto.getDate().substring(0, 4));
 				int month = Integer.parseInt(dto.getDate().substring(5, 7));
 				int day = Integer.parseInt(dto.getDate().substring(8));%>
-	data.addRows([ [ new Date(<%=year%>,<%=month%>,<%=day%>)
+	data.addRows([ [ new Date(<%=year%>,<%=month - 1%>,<%=day%>)
 	,
 <%=dto.getClose()%>
 	] ]);
@@ -109,7 +116,7 @@
 	<div id="chart_div" style="width: 100%; min-height:500px"></div>
 
 	<div class="text-right" style="margin-right: 100px">
-		<button type="button" id="prevPage" class="btn btn-outline-secondary">이전</button>
+		<button type="button" id="prevPage" class="btn btn-outline-secondary">테이블보기</button>
 	</div>
 </div>
 
@@ -119,7 +126,7 @@
 
 <script>
 	$("#prevPage").click(function() {
-		history.back(-1);
+		location.href = "list.jsp?page=<%=tempPage%>&start=<%=tempStart%>&end=<%=tempEnd%>";
 	})
 	$(window).resize(function(){
 		drawTrendlines();

@@ -22,31 +22,31 @@
 	int end_year = 0;
 	int end_month = 0;
 	int end_day = 0;
-
+	int sDate = 0;
+	int eDate = 0;
 	StringBuffer startDate = new StringBuffer();
 	StringBuffer endDate = new StringBuffer();
 
 	String tempPage = request.getParameter("page");
-	// String sYear = request.getParameter("startYear");
-	// String sMonth = request.getParameter("startMonth");
-	// String sDay = request.getParameter("startDay");
-	// String eYear = request.getParameter("endYear");
-	// String eMonth = request.getParameter("endMonth");
-	// String eDay = request.getParameter("endDay");
 	String tempSDate = request.getParameter("start");
 	String tempEDate = request.getParameter("end");
-	int sDate = 0;
-	int eDate = 0;
+	String tempCoin = request.getParameter("coin");
+	CrawlingDao dao = CrawlingDao.getInstance();
+
 	// 항상 예외처리 중요시 하자
 	// 쿼리에 page 값이 아예 없는 경우
 	if (tempPage == null || tempPage.length() == 0) {
 		cPage = 1;
 	}
 	if (tempSDate == null || tempSDate.length() == 0) {
-		tempSDate = "20140711";
+		tempSDate = dao.getOldestDate(tempCoin);
 	}
 	if (tempEDate == null || tempEDate.length() == 0) {
-		tempEDate = "20191219";
+		tempEDate = "20191220";
+	}
+	// coin에 대한 유효성 검사 필요하다.
+	if (tempCoin == null || tempCoin.length() == 0) {
+		tempCoin = "bitcoin";
 	}
 	// page 값은 있는데 숫자형식이 아닌경우
 	try {
@@ -58,10 +58,14 @@
 		sDate = Integer.parseInt(tempSDate);
 		eDate = Integer.parseInt(tempEDate);
 	} catch (NumberFormatException e) {
-		tempSDate = "20140711";
-		tempEDate = "20191219";
+		tempCoin = "bitcoin";
+		tempSDate = dao.getOldestDate(tempCoin);
+		tempEDate = "20191120";
 		sDate = Integer.parseInt(tempSDate);
 		eDate = Integer.parseInt(tempEDate);
+	}
+	if(tempSDate.compareTo(dao.getOldestDate(tempCoin)) < 0){
+		tempSDate = dao.getOldestDate(tempCoin);
 	}
 
 	start_year = sDate / 10000;
@@ -88,9 +92,9 @@
 	endDate.append(tempEDate.substring(6));
 
 	//CrawlingData.dataUpdate();
-	CrawlingDao dao = CrawlingDao.getInstance();
+
 	// 총 데이터수 구하기
-	totalRows = dao.getTotalRows(startDate.toString(), endDate.toString());
+	totalRows = dao.getTotalRows(startDate.toString(), endDate.toString(), tempCoin);
 	totalPage = totalRows % len == 0 ? totalRows / len : totalRows / len + 1;
 	// totalRows가 0일 때 문제 발생
 	if (totalPage == 0) {
@@ -101,22 +105,8 @@
 	}
 	// An = a1 + (n - 1)*d
 	start = (cPage - 1) * len;
-	ArrayList<CrawlingDto> list = dao.select(start, len, startDate.toString(), endDate.toString());
-	/*
-		가정
-		total Rows = 132;
-		len = 5;
-		pageLength = 10;
-					startPage	endPage
-		cPage = 1		1		  10
-		cPage = 5		1		  10
-		cPage = 14		11		  20
-		cPage = 22		21		  27
-		startPage = 1 + (currentBlock - 1) * pageLength
-		endPage = pageLength + (currentBlock - 1) * pageLength
-	*/
-	// int currentBlock = cPage / pageLength; 이렇게 해서
-	// 1 + currentBlock * pageLength 하면 안되는건지
+	ArrayList<CrawlingDto> list = dao.select(start, len, startDate.toString(), endDate.toString(), tempCoin);
+
 	int currentBlock = cPage % pageLength == 0 ? (cPage / pageLength) : (cPage / pageLength + 1);
 	int totalBlock = totalPage % pageLength == 0 ? (totalPage / pageLength) : (totalPage / pageLength + 1);
 	startPage = 1 + (currentBlock - 1) * pageLength;
@@ -143,17 +133,35 @@
 		<div class="col-lg-12">
 			<div class="text-right" style="margin-bottom: 10px;">
 				<form name="f" method="post" style="display: inline;">
+					<div class="text-left" style="margin-bottom: 10px">
+						<label for="coin"><b>Coin</b></label> <select
+							class="custom-select col-sm-2" id="coin" name="coin"
+							style="margin-left: 10px">
+							<option value="bitcoin" <%if (tempCoin.equals("bitcoin")) {%>
+								selected <%}%>>Bitcoin</option>
+							<option value="ethereum" <%if (tempCoin.equals("ethereum")) {%>
+								selected <%}%>>Ethereum</option>
+							<option value="xrp" <%if (tempCoin.equals("xrp")) {%> selected
+								<%}%>>XRP</option>
+							<option value="bitcoin-cash"
+								<%if (tempCoin.equals("bitcoin-cash")) {%> selected <%}%>>Bitcoin
+								Cash</option>
+							<option value="litecoin" <%if (tempCoin.equals("litecoin")) {%>
+								selected <%}%>>Litecoin</option>
+							<option value="eos" <%if (tempCoin.equals("eos")) {%> selected
+								<%}%>>EOS</option>
+							<option value="cardano" <%if (tempCoin.equals("cardano")) {%>
+								selected <%}%>>Cardano</option>
+						</select>
+						<button type="button" class="btn btn-outline-danger" id="savedb">Save
+							DB</button>
+					</div>
 					<div style="margin-bottom: 10px;">
-						<div class="text-left">
-							<a type="button" class="btn btn-outline-danger"
-								href="dbsave.jsp?page=<%=cPage%>&start=<%=tempSDate%>&end=<%=tempEDate%>">Save
-								DB</a>
-						</div>
 						<div class="col-sm-3"></div>
 						<label class="col-sm-3" for="syear"><b>시작지점</b></label> <select
 							class="custom-select col-sm-2" id="syear" name="startYear">
 							<%
-								for (int i = 2019; i >= dao.getOldestDate(); i--) {
+								for (int i = 2019; i >= Integer.parseInt(dao.getOldestDate(tempCoin).substring(0, 4)); i--) {
 							%>
 							<option value="<%=i%>" <%if (i == start_year) {%> selected <%}%>><%=i%></option>
 							<%
@@ -163,8 +171,9 @@
 							name="startMonth">
 							<%
 								for (int i = 1; i <= 12; i++) {
-							%>
-							<option value="<%=i%>" <%if (i == start_month) {%> selected <%}%>><%=i%></option>
+							%><%-- date는 month에서 1달 더해줘야 올바른 날짜가 나온다. --%>
+							<option value="<%=i%>" <%if (i == start_month) {%> selected
+								<%}%>><%=i%></option>
 							<%
 								}
 							%>
@@ -183,7 +192,7 @@
 						<label class="col-sm-3" for="eyear"><b>끝지점</b></label> <select
 							class="custom-select col-sm-2" id="eyear" name="endYear">
 							<%
-								for (int i = 2019; i >= dao.getOldestDate(); i--) {
+								for (int i = 2019; i >= Integer.parseInt(dao.getOldestDate(tempCoin).substring(0, 4)); i--) {
 							%>
 							<option value="<%=i%>" <%if (i == end_year) {%> selected <%}%>><%=i%></option>
 							<%
@@ -194,7 +203,8 @@
 							<%
 								for (int i = 1; i <= 12; i++) {
 							%>
-							<option value="<%=i%>" <%if (i == end_month) {%> selected <%}%>><%=i%></option>
+							<option value="<%=i%>" <%if (i == end_month) {%> selected
+								<%}%>><%=i%></option>
 							<%
 								}
 							%>
@@ -209,14 +219,12 @@
 						</select>
 					</div>
 				</form>
-				<button type="button" id="updateDept"
-					class="btn btn-outline-success" style="margin-right: 20px">검색</button>
-				<a
-					href="graph.jsp?page=<%=cPage%>&start=<%=tempSDate%>&end=<%=tempEDate%>"
-					class="btn btn-outline-secondary">Graph</a>
+				<button type="button" id="search" class="btn btn-outline-success"
+					style="margin-right: 20px">검색</button>
+				<button type="button" id="graph" class="btn btn-outline-secondary">Graph</button>
 			</div>
 			<h3>
-				<a href="list.jsp?page=1" style="text-decoration: none">Crawling</a>
+				<a href="list.jsp?coin=<%=tempCoin %>&page=1&start=<%=dao.getOldestDate(tempCoin) %>&end=20191220" style="text-decoration: none">Crawling</a>
 			</h3>
 		</div>
 
@@ -286,7 +294,7 @@
 					} else {
 				%>
 				<li class="page-item"><a class="page-link"
-					href="list.jsp?page=<%=startPage - 1%>&start=<%=tempSDate%>&end=<%=tempEDate%>">Previous</a></li>
+					href="list.jsp?coin=<%=tempCoin %>&page=<%=startPage - 1%>&start=<%=tempSDate%>&end=<%=tempEDate%>">Previous</a></li>
 				<%
 					}
 				%>
@@ -295,7 +303,7 @@
 				%>
 				<li class="page-item <%if (cPage == i) {%>active<%}%>"><a
 					class="page-link"
-					href="list.jsp?page=<%=i%>&start=<%=tempSDate%>&end=<%=tempEDate%>"><%=i%></a></li>
+					href="list.jsp?coin=<%=tempCoin %>&page=<%=i%>&start=<%=tempSDate%>&end=<%=tempEDate%>"><%=i%></a></li>
 				<%
 					}
 				%>
@@ -308,22 +316,48 @@
 					} else {
 				%>
 				<li class="page-item"><a class="page-link"
-					href="list.jsp?page=<%=endPage + 1%>&start=<%=tempSDate%>&end=<%=tempEDate%>">Next</a></li>
+					href="list.jsp?coin=<%=tempCoin %>&page=<%=endPage + 1%>&start=<%=tempSDate%>&end=<%=tempEDate%>">Next</a></li>
 				<%
 					}
 				%>
 			</ul>
 		</nav>
 
-
 	</div>
-</div>
 </div>
 <!-- main end -->
 <%@ include file="../inc/footer.jsp"%>
 
 <script>
-	$("#updateDept").click(function() {
+	$("#search").click(function() {
+		let coin = $("#coin option:selected").val();
+		let syear = $("#syear option:selected").val();
+		let smonth = $("#smonth option:selected").val();
+		let sday = $("#sday option:selected").val();
+		let eyear = $("#eyear option:selected").val();
+		let emonth = $("#emonth option:selected").val();
+		let eday = $("#eday option:selected").val();
+		
+		if (smonth.length == 1) {
+			smonth = "0" + smonth;
+		}
+		if (sday.length == 1) {
+			sday = "0" + sday;
+		}
+		if (emonth.length == 1) {
+			emonth = "0" + emonth;
+		}
+		if (eday.length == 1) {
+			eday = "0" + eday;
+		}
+		let startDate = syear + smonth + sday;
+		let endDate = eyear + emonth + eday;
+
+		f.action = "list.jsp?coin="+ coin + "&page=1&start=" + startDate + "&end=" + endDate;
+		f.submit();
+	})
+	$("#graph").click(function() {
+		let coin = $("#coin option:selected").val();
 		let syear = $("#syear option:selected").val();
 		let smonth = $("#smonth option:selected").val();
 		let sday = $("#sday option:selected").val();
@@ -344,8 +378,17 @@
 		}
 		let startDate = syear + smonth + sday;
 		let endDate = eyear + emonth + eday;
-
-		f.action = "list.jsp?page=1&start=" + startDate + "&end=" + endDate;
+		
+		if(startDate == <%=tempSDate%> && endDate == <%=tempEDate%>){
+			f.action = "graph.jsp?coin=" + coin + "&page=<%=cPage%>&start=" + startDate + "&end=" + endDate;
+				} else {
+					f.action = "graph.jsp?start=" + startDate + "&end="+ endDate;
+				}
+				f.submit();
+			})
+	$("#savedb").click(function() {
+		let coin = $("#coin option:selected").val();
+		f.action = "dbsave.jsp?coin=" + coin;
 		f.submit();
 	})
 </script>
