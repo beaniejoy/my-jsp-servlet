@@ -52,12 +52,24 @@ try {
 ```
 
 - Google LineChart를 이용한 그래프 그리기  
-  
-가로축 데이터를 입력하는데 Date 형식으로 받고자 하면 new Date(year, month, day)를 이용해야한다.
-  
-  
+가로축 데이터를 입력하는데 Date 형식으로 받고자 하면 new Date(year, month, day)를 이용해야한다.  
+```
+data.addRows([ 
+[ new Date(<%=year%>, <%=month%>, <%=day%>), <%=dto.getClose()%> ] 
+]);
+```
 ※ [반응형으로 그래프 그리기](https://codepen.io/flopreynat/pen/BfLkA)  
 → 그래프가 반응형이 아니면 graph.jsp에 접근하는순간의 브라우저 창크기를 기준으로 그래프가 그려짐  
-→ 접속했을 때 무슨 크기인지 알 수 없기 때문에 반응형으로 그 때 그 때 동적으로 사이즈를 할당해야 한다.(특히 horizontal 크기) 
+→ 접속했을 때 무슨 크기인지 알 수 없기 때문에 반응형으로 그 때 그 때 동적으로 사이즈를 할당해야 한다.  
+(특히 horizontal 크기) 
+```
+<div id="chart_div" style="width: 100%; min-height:500px"></div>
+
+<script>
+$(window).resize(function(){
+	drawTrendlines();
+</script>
+});
+```
 
 
