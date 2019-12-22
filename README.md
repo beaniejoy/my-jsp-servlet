@@ -27,31 +27,34 @@ Crawling을 하는데 있어서 DB에 저장까지 문제없이 잘되다가 어
 많은 자료를 한꺼번에 크롤링해서 그런건지 아니면 무슨 오류가 있는 건지 (웹사이트에서 막아둔 건지는 모르나 대용량으로 많은 데이터를 한꺼번에 크롤링하는 것이 막힘, 길어봐야 2년정도의 데이터정도 가능한듯)  
 <b>→ 해결: 2년씩 크롤링 하면 전체 데이터 크롤링 가능</b>  
 ```
-int cYear = 2019;
-		while (cYear >= 2013) {
-			StringBuffer startDate = new StringBuffer();
-			StringBuffer endDate = new StringBuffer();
+int cYear = 2019; // 2019년 기준(원하는 날짜로 해서 삽입가능)
+while (cYear >= 2013) {
+	StringBuffer startDate = new StringBuffer();
+	StringBuffer endDate = new StringBuffer();
 
-			endDate.append(cYear);
-			endDate.append("12");
-			endDate.append("19");
-			cYear -= 2;
-			startDate.append(cYear);
-			startDate.append("12");
-			startDate.append("19");
+	endDate.append(cYear);
+	endDate.append("12");
+	endDate.append("19");
+	cYear -= 2;
+	startDate.append(cYear);
+	startDate.append("12");
+	startDate.append("19");
 
-			String url = "https://coinmarketcap.com/currencies/bitcoin/historical-data/?start=" + startDate.toString()
-					+ "&end=" + endDate.toString();
-			Document doc = null;
+	String url = "https://coinmarketcap.com/currencies/bitcoin/historical-data/?start="
+		+ startDate.toString()
+		+ "&end=" 
+		+ endDate.toString();
 
-			try {
-			 
-				}
+	Document doc = null;
 
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	try {
+		// 대상 데이터 크롤링하기
 		}
+
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+}
 ```
 
 - 새로고침하면 alert 알림표시가 뜨는데 없앨 수는 없는지(해결 못함)  
