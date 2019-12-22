@@ -16,13 +16,43 @@
 
 <br>
 
-#### 에러사항
+#### 작업상황
 
 - include를 통해 header, footer를 분리했을시 jQuery 연동은 footer에 있기 때문에
 script를 통해 jQuery를 이용할시 footer include한 곳보다 아래에서 작업해야 한다. (script작업은 무조건 맨 밑에서 하는 것이 좋다.)
 
-- Crawling을 하는데 있어서 DB에 저장까지 문제없이 잘되다가 어느순간 IndexOutOfBoundsException 예외상황이 발생  
+- Crawling 데이터 개수 제한  
+[(크롤링 대상: 비트코인 과거데이터)](https://coinmarketcap.com/currencies/bitcoin/historical-data/)  
+Crawling을 하는데 있어서 DB에 저장까지 문제없이 잘되다가 어느순간 IndexOutOfBoundsException 예외상황이 발생  
 많은 자료를 한꺼번에 크롤링해서 그런건지 아니면 무슨 오류가 있는 건지 (웹사이트에서 막아둔 건지는 모르나 대용량으로 많은 데이터를 한꺼번에 크롤링하는 것이 막힘, 길어봐야 2년정도의 데이터정도 가능한듯)  
+<b>→ 해결: 2년씩 크롤링 하면 전체 데이터 크롤링 가능</b>  
+```
+int cYear = 2019;
+		while (cYear >= 2013) {
+			StringBuffer startDate = new StringBuffer();
+			StringBuffer endDate = new StringBuffer();
+
+			endDate.append(cYear);
+			endDate.append("12");
+			endDate.append("19");
+			cYear -= 2;
+			startDate.append(cYear);
+			startDate.append("12");
+			startDate.append("19");
+
+			String url = "https://coinmarketcap.com/currencies/bitcoin/historical-data/?start=" + startDate.toString()
+					+ "&end=" + endDate.toString();
+			Document doc = null;
+
+			try {
+			 
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+```
 
 - 새로고침하면 alert 알림표시가 뜨는데 없앨 수는 없는지(해결 못함)  
 
@@ -57,6 +87,13 @@ try {
 data.addRows([ 
 [ new Date(<%=year%>, <%=month%>, <%=day%>), <%=dto.getClose()%> ] 
 ]);
+
+var options = {
+	hAxis : {
+		title : 'Date',
+		format : 'yyyy-MM'
+	}
+}
 ```
 ※ [반응형으로 그래프 그리기](https://codepen.io/flopreynat/pen/BfLkA)  
 → 그래프가 반응형이 아니면 graph.jsp에 접근하는순간의 브라우저 창크기를 기준으로 그래프가 그려짐  
@@ -71,5 +108,3 @@ $(window).resize(function(){
 </script>
 });
 ```
-
-
