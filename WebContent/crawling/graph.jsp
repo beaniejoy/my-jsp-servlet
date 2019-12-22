@@ -1,5 +1,49 @@
+<%@page import="java.util.Date"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="beanie.dto.CrawlingDto"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="beanie.dao.CrawlingDao"%>
 <%@ page pageEncoding="utf-8"%>
 <%@ include file="../inc/header.jsp"%>
+<%
+	String tempPage = request.getParameter("page");
+	String tempStart = request.getParameter("start");
+	String tempEnd = request.getParameter("end");
+
+	if (tempPage == null || tempPage.length() == 0) {
+		tempPage = "1";
+	}
+	if (tempStart == null || tempStart.length() == 0) {
+		response.sendRedirect("list.jsp?page=" + tempPage);
+		return;
+	}
+	if (tempEnd == null || tempEnd.length() == 0) {
+		response.sendRedirect("list.jsp?page=" + tempPage);
+		return;
+	}
+	int cPage = 0;
+	int totalRows = 0;
+
+	CrawlingDao dao = CrawlingDao.getInstance();
+
+	StringBuffer startDate = new StringBuffer();
+	StringBuffer endDate = new StringBuffer();
+	startDate.append(tempStart.substring(0, 4));
+	startDate.append("-");
+	startDate.append(tempStart.substring(4, 6));
+	startDate.append("-");
+	startDate.append(tempStart.substring(6));
+
+	endDate.append(tempEnd.substring(0, 4));
+	endDate.append("-");
+	endDate.append(tempEnd.substring(4, 6));
+	endDate.append("-");
+	endDate.append(tempEnd.substring(6));
+
+	totalRows = dao.getTotalRows(startDate.toString(), tempEnd.toString());
+	ArrayList<CrawlingDto> list = new ArrayList<CrawlingDto>();
+	list = dao.select(0, totalRows, startDate.toString(), endDate.toString());
+%>
 <!-- breadcrumb start -->
 <nav aria-label="breadcrumb">
 	<ol class="breadcrumb">
@@ -8,6 +52,8 @@
 	</ol>
 </nav>
 <!-- breadcrumb end -->
+
+
 <script type="text/javascript"
 	src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
@@ -18,47 +64,32 @@
 
 	function drawTrendlines() {
 		var data = new google.visualization.DataTable();
-		data.addColumn('number', 'X');
-		data.addColumn('number', 'Dogs');
-		data.addColumn('number', 'Cats');
-
-		data.addRows([ [ 0, 0, 0 ], [ 1, 10, 5 ], [ 2, 23, 15 ], [ 3, 17, 9 ],
-				[ 4, 18, 10 ], [ 5, 9, 5 ], [ 6, 11, 3 ], [ 7, 27, 19 ],
-				[ 8, 33, 25 ], [ 9, 40, 32 ], [ 10, 32, 24 ], [ 11, 35, 27 ],
-				[ 12, 30, 22 ], [ 13, 40, 32 ], [ 14, 42, 34 ], [ 15, 47, 39 ],
-				[ 16, 44, 36 ], [ 17, 48, 40 ], [ 18, 52, 44 ], [ 19, 54, 46 ],
-				[ 20, 42, 34 ], [ 21, 55, 47 ], [ 22, 56, 48 ], [ 23, 57, 49 ],
-				[ 24, 60, 52 ], [ 25, 50, 42 ], [ 26, 52, 44 ], [ 27, 51, 43 ],
-				[ 28, 49, 41 ], [ 29, 53, 45 ], [ 30, 55, 47 ], [ 31, 60, 52 ],
-				[ 32, 61, 53 ], [ 33, 59, 51 ], [ 34, 62, 54 ], [ 35, 65, 57 ],
-				[ 36, 62, 54 ], [ 37, 58, 50 ], [ 38, 55, 47 ], [ 39, 61, 53 ],
-				[ 40, 64, 56 ], [ 41, 65, 57 ], [ 42, 63, 55 ], [ 43, 66, 58 ],
-				[ 44, 67, 59 ], [ 45, 69, 61 ], [ 46, 69, 61 ], [ 47, 70, 62 ],
-				[ 48, 72, 64 ], [ 49, 68, 60 ], [ 50, 66, 58 ], [ 51, 65, 57 ],
-				[ 52, 67, 59 ], [ 53, 70, 62 ], [ 54, 71, 63 ], [ 55, 72, 64 ],
-				[ 56, 73, 65 ], [ 57, 75, 67 ], [ 58, 70, 62 ], [ 59, 68, 60 ],
-				[ 60, 64, 56 ], [ 61, 60, 52 ], [ 62, 65, 57 ], [ 63, 67, 59 ],
-				[ 64, 68, 60 ], [ 65, 69, 61 ], [ 66, 70, 62 ], [ 67, 72, 64 ],
-				[ 68, 75, 67 ], [ 69, 80, 72 ] ]);
-
-		var options = {
+		data.addColumn('datetime', 'date');
+		data.addColumn('number', 'bitcoin');
+<%for (CrawlingDto dto : list) {
+				int year = Integer.parseInt(dto.getDate().substring(0, 4));
+				int month = Integer.parseInt(dto.getDate().substring(5, 7));
+				int day = Integer.parseInt(dto.getDate().substring(8));%>
+	data.addRows([ [ new Date(<%=year%>,<%=month%>,<%=day%>)
+	,
+<%=dto.getClose()%>
+	] ]);
+<%}%>
+	var options = {
 			hAxis : {
-				title : 'Time'
+				title : 'Date',
+				format : 'yyyy-MM'
 			},
 			vAxis : {
-				title : 'Popularity'
+				title : 'ClosePrice'
 			},
-			colors : [ '#AB0D06', '#007329' ],
+			colors : [ '#AB0D06' ],
+			height: 500,
 			trendlines : {
 				0 : {
 					type : 'exponential',
 					color : '#333',
 					opacity : 1
-				},
-				1 : {
-					type : 'linear',
-					color : '#111',
-					opacity : .3
 				}
 			}
 		};
@@ -67,10 +98,30 @@
 				.getElementById('chart_div'));
 		chart.draw(data, options);
 	}
-</script>
-<div id="chart_div"></div>
 
+</script>
+<div class="col-lg-12">
+	<h5>
+		<%=startDate.toString()%>
+		~
+		<%=endDate.toString()%>
+	</h5>
+	<div id="chart_div" style="width: 100%; min-height:500px"></div>
+
+	<div class="text-right" style="margin-right: 100px">
+		<button type="button" id="prevPage" class="btn btn-outline-secondary">이전</button>
+	</div>
+</div>
 
 
 
 <%@ include file="../inc/footer.jsp"%>
+
+<script>
+	$("#prevPage").click(function() {
+		history.back(-1);
+	})
+	$(window).resize(function(){
+		drawTrendlines();
+	});
+</script>

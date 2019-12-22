@@ -1,3 +1,4 @@
+<%@page import="java.text.DecimalFormat"%>
 <%@page import="beanie.crawling.CrawlingData"%>
 <%@ page import="beanie.dto.CrawlingDto"%>
 <%@ page import="beanie.dao.CrawlingDao"%>
@@ -86,7 +87,7 @@
 	endDate.append("-");
 	endDate.append(tempEDate.substring(6));
 
-	// CrawlingData.dataUpdate();
+	//CrawlingData.dataUpdate();
 	CrawlingDao dao = CrawlingDao.getInstance();
 	// 총 데이터수 구하기
 	totalRows = dao.getTotalRows(startDate.toString(), endDate.toString());
@@ -124,6 +125,9 @@
 		endPage = totalPage;
 	}
 	int pageNum = totalRows - start;
+
+	DecimalFormat formatInt = new DecimalFormat("###,###");
+	DecimalFormat formatFloat = new DecimalFormat("###,###.##");
 %>
 <!-- breadcrumb start -->
 <nav aria-label="breadcrumb">
@@ -137,68 +141,83 @@
 <div class="container">
 	<div class="row">
 		<div class="col-lg-12">
-			<h3>
-				<a href="list.jsp?page=1" style="text-decoration: none">Crawling</a>
-			</h3>
 			<div class="text-right" style="margin-bottom: 10px;">
 				<form name="f" method="post" style="display: inline;">
-					<select id="syear" name="startYear">
-						<%
-							for (int i = 2019; i >= dao.getOldestDate(); i--) {
-						%>
-						<option value="<%=i%>" <%if (i == start_year) {%> selected <%}%>><%=i%></option>
-						<%
-							}
-						%>
-					</select> <select id="smonth" name="startMonth">
-						<%
-							for (int i = 1; i <= 12; i++) {
-						%>
-						<option value="<%=i%>" <%if (i == start_month) {%> selected <%}%>><%=i%></option>
-						<%
-							}
-						%>
-					</select> <select id="sday" name="startDay">
-						<%
-							for (int i = 1; i <= 31; i++) {
-						%>
-						<option value="<%=i%>" <%if (i == start_day) {%> selected <%}%>><%=i%></option>
-						<%
-							}
-						%>
-					</select> <span> ~ </span> <select id="eyear" name="endYear">
-						<%
-							for (int i = 2019; i >= dao.getOldestDate(); i--) {
-						%>
-						<option value="<%=i%>" <%if (i == end_year) {%> selected <%}%>><%=i%></option>
-						<%
-							}
-						%>
-					</select> <select id="emonth" name="endMonth">
-						<%
-							for (int i = 1; i <= 12; i++) {
-						%>
-						<option value="<%=i%>" <%if (i == end_month) {%> selected <%}%>><%=i%></option>
-						<%
-							}
-						%>
-					</select> <select id="eday" name="endDay">
-						<%
-							for (int i = 1; i <= 31; i++) {
-						%>
-						<option value="<%=i%>" <%if (i == end_day) {%> selected <%}%>><%=i%></option>
-						<%
-							}
-						%>
-					</select>
-
+					<div style="margin-bottom: 10px;">
+						<div class="text-left">
+							<a type="button" class="btn btn-outline-danger"
+								href="dbsave.jsp?page=<%=cPage%>&start=<%=tempSDate%>&end=<%=tempEDate%>">Save
+								DB</a>
+						</div>
+						<div class="col-sm-3"></div>
+						<label class="col-sm-3" for="syear"><b>시작지점</b></label> <select
+							class="custom-select col-sm-2" id="syear" name="startYear">
+							<%
+								for (int i = 2019; i >= dao.getOldestDate(); i--) {
+							%>
+							<option value="<%=i%>" <%if (i == start_year) {%> selected <%}%>><%=i%></option>
+							<%
+								}
+							%>
+						</select> <select class="custom-select col-sm-2" id="smonth"
+							name="startMonth">
+							<%
+								for (int i = 1; i <= 12; i++) {
+							%>
+							<option value="<%=i%>" <%if (i == start_month) {%> selected <%}%>><%=i%></option>
+							<%
+								}
+							%>
+						</select> <select class="custom-select col-sm-2" id="sday" name="startDay">
+							<%
+								for (int i = 1; i <= 31; i++) {
+							%>
+							<option value="<%=i%>" <%if (i == start_day) {%> selected <%}%>><%=i%></option>
+							<%
+								}
+							%>
+						</select>
+					</div>
+					<div style="margin-bottom: 10px;">
+						<div class="col-sm-3"></div>
+						<label class="col-sm-3" for="eyear"><b>끝지점</b></label> <select
+							class="custom-select col-sm-2" id="eyear" name="endYear">
+							<%
+								for (int i = 2019; i >= dao.getOldestDate(); i--) {
+							%>
+							<option value="<%=i%>" <%if (i == end_year) {%> selected <%}%>><%=i%></option>
+							<%
+								}
+							%>
+						</select> <select class="custom-select col-sm-2" id="emonth"
+							name="endMonth">
+							<%
+								for (int i = 1; i <= 12; i++) {
+							%>
+							<option value="<%=i%>" <%if (i == end_month) {%> selected <%}%>><%=i%></option>
+							<%
+								}
+							%>
+						</select> <select class="custom-select col-sm-2" id="eday" name="endDay">
+							<%
+								for (int i = 1; i <= 31; i++) {
+							%>
+							<option value="<%=i%>" <%if (i == end_day) {%> selected <%}%>><%=i%></option>
+							<%
+								}
+							%>
+						</select>
+					</div>
 				</form>
 				<button type="button" id="updateDept"
-					class="btn btn-outline-success">검색</button>
+					class="btn btn-outline-success" style="margin-right: 20px">검색</button>
 				<a
 					href="graph.jsp?page=<%=cPage%>&start=<%=tempSDate%>&end=<%=tempEDate%>"
 					class="btn btn-outline-secondary">Graph</a>
 			</div>
+			<h3>
+				<a href="list.jsp?page=1" style="text-decoration: none">Crawling</a>
+			</h3>
 		</div>
 
 
@@ -233,12 +252,12 @@
 					%>
 					<tr>
 						<td><%=dto.getDate()%></td>
-						<td><%=dto.getOpen()%></td>
-						<td><%=dto.getHigh()%></td>
-						<td><%=dto.getLow()%></td>
-						<td><%=dto.getClose()%></td>
-						<td><%=dto.getVolume()%></td>
-						<td><%=dto.getMarketCap()%></td>
+						<td><%=formatFloat.format(dto.getOpen())%></td>
+						<td><%=formatFloat.format(dto.getHigh())%></td>
+						<td><%=formatFloat.format(dto.getLow())%></td>
+						<td><%=formatFloat.format(dto.getClose())%></td>
+						<td><%=formatInt.format(dto.getVolume())%></td>
+						<td><%=formatInt.format(dto.getMarketCap())%></td>
 					</tr>
 					<%
 						}
