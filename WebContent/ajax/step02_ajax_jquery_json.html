@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>step02_ajax_jqeury_json</title>
+<script src="../js/jquery-3.4.1.js"></script>
+<script>
+$(function(){
+	$("#LoadAjax").click(function(){
+		$.ajax({
+			//type : 'GET',
+			// get방식이라 parameter붙여야한다.
+			//url : 'emp_json.jsp?start=0&length=5',
+			type : 'POST',
+			url : 'emp_json.jsp',
+			//post방식은 이렇게 parameter정보를 따로 정해야한다.
+			data : {"start":0,"length":5},
+			dataType : 'json', //xml, html
+			error : function(){
+				alert('Json Load Error');
+			},
+			success : function(obj){
+				console.log(obj);
+				console.log(typeof obj);
+				const listArray = obj.items;
+				let msg = '';
+				for(let i = 0; i<listArray.length;i++){
+					let no = listArray[i].no;
+					let name = listArray[i].name;
+					let job = listArray[i].job;
+					let mgr = listArray[i].mgr;
+					let dname = listArray[i].dname;
+					let deptNo = listArray[i].deptNo;
+					let hiredate = listArray[i].hiredate;
+					msg += no + ","+name+","+job+","+mgr+","+dname+","+deptNo+","+hiredate+"<br>";
+				}
+				$('#sung').html(msg);
+			}
+		});
+	});
+});
+</script>
+</head>
+
+<body>
+	<div id="sung"></div>
+	<button id="LoadAjax">Ajax 불러오기</button>
+</body>
+
+
+</html>

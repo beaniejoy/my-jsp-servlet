@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>step02_ajax_jqurry_json</title>
+<script src="../js/jquery-3.4.1.js"></script>
+<script>
+$(function(){
+	// jsonp는 해당 데이터가 call로 부른 함수안으로 들어와야 한다.
+	$("#LoadAjax").click(function(){
+		$.ajax({
+			type : 'GET',
+			// get방식이라 parameter붙여야한다.
+			url : 'naver_proxy.jsp',
+			//type : 'POST',
+			//url : 'emp_json.jsp',
+		
+			//data : {"start":0,"length":5},
+			dataType : 'json', //xml, html
+			
+			error : function(){
+				alert('Json Load Error');
+			},
+			success : function(obj){
+				console.log(obj);
+				console.log(typeof obj);
+				$('#sung').html(JSON.stringify(obj));				
+				}
+			}
+		});
+	});
+});
+</script>
+</head>
+
+<body>
+	<div id="sung"></div>
+	<button id="LoadAjax">Ajax 불러오기</button>
+</body>
+
+
+</html>

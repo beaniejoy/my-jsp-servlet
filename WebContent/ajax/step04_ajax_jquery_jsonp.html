@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>step02_ajax_jqurry_json</title>
+<script src="../js/jquery-3.4.1.js"></script>
+<script>
+$(function(){
+	// jsonp는 해당 데이터가 call로 부른 함수안으로 들어와야 한다.
+	$("#LoadAjax").click(function(){
+		$.ajax({
+			type : 'GET',
+			// get방식이라 parameter붙여야한다.
+			url : 'http://acornacademy.co.kr/blockchain/naver_json.jsp',
+			//type : 'POST',
+			//url : 'emp_json.jsp',
+		
+			//data : {"start":0,"length":5},
+			dataType : 'jsonp', //xml, html
+			// 무조건 jsonp 형식으로 보내줘야 한다.(외부url일 때)
+			// 하지만 해당 사이트가 jsonp를 지원해주지 않으면 못쓴다.
+			jsonp : 'call', // 해당사이트 url의 key값(?call=test)
+			error : function(){
+				alert('Json Load Error');
+			},
+			success : function(obj){
+				console.log(obj);
+				console.log(typeof obj);
+				$('#sung').html(JSON.stringify(obj));				
+			}
+		});
+	});
+});
+</script>
+</head>
+
+<body>
+	<div id="sung"></div>
+	<button id="LoadAjax">Ajax 불러오기</button>
+</body>
+
+
+</html>

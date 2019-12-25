@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>step01_ajax_get_json</title>
+<script>
+	var xhr = null;
+	try {
+		xhr = new XMLHttpRequest();
+	} catch (e) {
+		xhr = new ActiveObject("Msxm12.XMLHTTP");
+	}
+
+	if (xhr == null) {
+		alert("Error xhr object");
+	}
+</script>
+
+</head>
+
+<body>
+	<div id="sung"></div>
+	<button id="LoadAjax">Ajax 불러오기</button>
+</body>
+<script>
+	document.getElementById("LoadAjax").addEventListener(
+			"click",
+			function() {
+				console.log('event');
+				// ajax 요청은 무조건 json이 string으로 온다.
+				xhr.open("GET", "emp_json.jsp?start=0&length=5", true);
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4 && xhr.status == 200) {
+						// string형태로 json을 받아오는 것이다.
+						console.log(xhr.responseText);
+						// string > object로 변환
+						const obj = JSON.parse(xhr.responseText);
+						const listArray = obj.items;
+						let msg = '';
+						for (let i = 0; i < listArray.length; i++) {
+							let no = listArray[i].no;
+							let name = listArray[i].name;
+							let job = listArray[i].job;
+							let mgr = listArray[i].mgr;
+							let dname = listArray[i].dname;
+							let deptNo = listArray[i].deptNo;
+							let hiredate = listArray[i].hiredate;
+							msg += no + "," + name + "," + job + "," + mgr
+									+ "," + dname + "," + deptNo + ","
+									+ hiredate + "<br>";
+						}
+						document.getElementById("sung").innerHTML = msg;
+					}
+				}
+				xhr.send(null);
+			})
+</script>
+
+</html>

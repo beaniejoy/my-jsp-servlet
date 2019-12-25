@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>step03_crossdomain.html</title>
+
+
+
+
+</head>
+
+<body>
+	<div id="sung"></div>
+</body>
+<script>
+// 마치 로컬에 있는 자원처럼 쓸 수가 있다.
+function test(obj){
+	document.getElementById("sung").innerHTML = JSON.stringify(obj);
+}
+</script>
+<!-- script src에서 외부도메인에서 데이터를 가져오기 위해-->
+<!-- 편법 -->
+<script src="http://acornacademy.co.kr/blockchain/naver_json.jsp?call=test"></script>
+</html>
